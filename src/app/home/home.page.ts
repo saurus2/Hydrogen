@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { GmapsService } from '../services/gamps/gmaps.service';
 
 @Component({
   selector: 'app-home',
@@ -6,7 +7,21 @@ import { Component } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  
+  @ViewChild('map', {static: true}) mapElementRef: ElementRef;
+  googleMaps: any;
 
-  constructor() {}
+  constructor(
+    private gmaps: GmapsService
+  ) {}
+  
+  async loadMap() {
+    try {
+      let googleMaps: any = await this.gmaps.loadGoogleMaps();
 
+    } catch(e) {
+      console.log(e);
+    }
+    
+  }
 }
