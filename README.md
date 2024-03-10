@@ -1,3 +1,6 @@
+### dependency
+npm i
+
 ### Runing Command
 ionic serve
 
