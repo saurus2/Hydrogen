@@ -1,6 +1,6 @@
 ### dependency
+npm i  
 npm audit fix  
-npm i
 
 ### Runing Command
 ionic serve
