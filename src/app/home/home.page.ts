@@ -77,7 +77,7 @@ export class HomePage implements OnInit{
   }
 
   checkAndRemoveMarker(marker: any) {
-    const index = this.markers.findIndex(x => x.position.lat() == this.markerClickListener.position.lat && x.position.lng == marker.position.lng);
+    const index = this.markers.findIndex(x => x.position.lat() == marker.position.lat() && x.position.lng() == marker.position.lng());
     console.log('is marker already: ', index);
     if(index >= 0) {
       this.markers[index].setMap(null);
@@ -86,6 +86,6 @@ export class HomePage implements OnInit{
     }
   }
 
-  
+    
 
 }
