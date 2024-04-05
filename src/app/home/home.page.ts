@@ -1,6 +1,6 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild, NgZone } from '@angular/core';
 import { GmapsService } from '../services/gamps/gmaps.service';
-import { Geolocation } from '@capacitor/geolocation';
+import { ClearWatchOptions, Geolocation } from '@capacitor/geolocation';
 import { Platform } from '@ionic/angular';
 
 @Component({
@@ -21,11 +21,13 @@ export class HomePage implements OnInit{
   markers: any[] = [];
   currentLat: any;
   currentLng: any;
+  watchId: any;
 
   constructor(
     private gmaps: GmapsService,
     private renderer: Renderer2,
-    private platform: Platform
+    private platform: Platform,
+    public ngZone: NgZone,
   ) {
 
   }
@@ -45,9 +47,6 @@ export class HomePage implements OnInit{
       let googleMaps: any = await this.gmaps.loadGoogleMaps();
       this.googleMaps = googleMaps;
       const mapEl = this.mapElementRef.nativeElement;
-      // this.center.lat = this.currentLat;
-      // this.center.lng = this.currentLng;
-      console.log("current", this.currentLat, this.currentLng);
       const location = new googleMaps.LatLng(this.center.lat, this.center.lng);
       this.map = new googleMaps.Map(mapEl, {
         center: location,
@@ -74,7 +73,7 @@ export class HomePage implements OnInit{
       url: 'assets/icon/pin.png',
       scaledSize: new googleMaps.Size(35, 50),
     };
-    console.log("hello", location);
+    // console.log("hello", location);
     const marker = new googleMaps.Marker({
       position: location,
       map: this.map,
@@ -104,6 +103,18 @@ export class HomePage implements OnInit{
     this.currentLat = coordinates.coords.latitude;
     this.currentLng = coordinates.coords.longitude;
     console.log('Current position:', this.currentLat, this.currentLng);
-  }
 
+    const location = this.googleMaps.LatLng(this.currentLat, this.currentLng);
+    const icon = {
+      url: 'assets/icon/pin.png',
+      scaledSize: this.googleMaps.Size(35, 50),
+    };
+    const marker = this.googleMaps.Marker({
+      position: this.map.getCenter(),
+      map: this.map,
+      icon: icon,
+      draggable: true,
+    });
+    
+  }
 }
