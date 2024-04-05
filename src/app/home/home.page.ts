@@ -1,11 +1,14 @@
 import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { GmapsService } from '../services/gamps/gmaps.service';
+import { Geolocation } from '@capacitor/geolocation';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
+
 export class HomePage implements OnInit{
   
   @ViewChild('map', { static: true })
@@ -16,11 +19,16 @@ export class HomePage implements OnInit{
   mapClickListener: any;
   markerClickListener: any;
   markers: any[] = [];
+  currentLat: any;
+  currentLng: any;
 
   constructor(
     private gmaps: GmapsService,
     private renderer: Renderer2,
-  ) {}
+    private platform: Platform
+  ) {
+
+  }
   
   ngOnInit(): void {
 
@@ -30,11 +38,16 @@ export class HomePage implements OnInit{
     this.loadMap();
   }
 
+
+
   async loadMap() {
     try {
       let googleMaps: any = await this.gmaps.loadGoogleMaps();
       this.googleMaps = googleMaps;
       const mapEl = this.mapElementRef.nativeElement;
+      // this.center.lat = this.currentLat;
+      // this.center.lng = this.currentLng;
+      console.log("current", this.currentLat, this.currentLng);
       const location = new googleMaps.LatLng(this.center.lat, this.center.lng);
       this.map = new googleMaps.Map(mapEl, {
         center: location,
@@ -86,6 +99,11 @@ export class HomePage implements OnInit{
     }
   }
 
-    
+  async getLocation() {
+    const coordinates = await Geolocation.getCurrentPosition();
+    this.currentLat = coordinates.coords.latitude;
+    this.currentLng = coordinates.coords.longitude;
+    console.log('Current position:', this.currentLat, this.currentLng);
+  }
 
 }
