@@ -99,22 +99,24 @@ export class HomePage implements OnInit{
   }
 
   async getLocation() {
+    let googleMaps: any = await this.gmaps.loadGoogleMaps();
+    this.googleMaps = googleMaps;
+
     const coordinates = await Geolocation.getCurrentPosition();
     this.currentLat = coordinates.coords.latitude;
     this.currentLng = coordinates.coords.longitude;
-    console.log('Current position:', this.currentLat, this.currentLng);
 
-    const location = this.googleMaps.LatLng(this.currentLat, this.currentLng);
+    const location = new googleMaps.LatLng(this.currentLat, this.currentLng);
     const icon = {
       url: 'assets/icon/pin.png',
-      scaledSize: this.googleMaps.Size(35, 50),
+      scaledSize: new googleMaps.Size(35, 50),
     };
-    const marker = this.googleMaps.Marker({
-      position: this.map.getCenter(),
+
+    console.log('Current position:', location);
+    var marker = new googleMaps.Marker({
+      position: location,
       map: this.map,
-      icon: icon,
-      draggable: true,
     });
-    
+    this.map.setCenter(location);
   }
 }
