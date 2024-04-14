@@ -14,7 +14,7 @@ export class HomePage implements OnInit{
   @ViewChild('map', { static: true })
   mapElementRef!: ElementRef;
   googleMaps: any;
-  center = { lat: 28.649944693035188, lng: 77.23961776224988 };
+  center = { lat: 37.335480, lng: -121.893028 };
   map: any;
   mapClickListener: any;
   markerClickListener: any;
@@ -22,6 +22,7 @@ export class HomePage implements OnInit{
   currentLat: any;
   currentLng: any;
   watchId: any;
+
 
   constructor(
     private gmaps: GmapsService,
@@ -40,8 +41,7 @@ export class HomePage implements OnInit{
     this.loadMap();
   }
 
-
-
+  // loading map
   async loadMap() {
     try {
       let googleMaps: any = await this.gmaps.loadGoogleMaps();
@@ -60,13 +60,15 @@ export class HomePage implements OnInit{
     } 
   }
 
+  // Click event to add marker
   onMapClick(){
     this.mapClickListener = this.googleMaps.event.addListener(this.map, "click", (mapMouseEvent: { latLng: { toJSON: () => any; }; }) => {
       console.log("hi",mapMouseEvent.latLng.toJSON());
       this.addMarker(mapMouseEvent.latLng);
     });
   }
-
+  
+  // adding marker function
   addMarker(location: any){
     let googleMaps: any = this.googleMaps;
     const icon = {
@@ -80,6 +82,7 @@ export class HomePage implements OnInit{
       icon: icon,
       draggable: true,
     });
+    // adding markers in array as add and remove
     this.markers.push(marker);
     this.markerClickListener = this.googleMaps.event.addListener(marker, "click", () => {
       console.log('markerclick', marker);
@@ -88,6 +91,7 @@ export class HomePage implements OnInit{
     });
   }
 
+  // removing marker function
   checkAndRemoveMarker(marker: any) {
     const index = this.markers.findIndex(x => x.position.lat() == marker.position.lat() && x.position.lng() == marker.position.lng());
     console.log('is marker already: ', index);
@@ -98,6 +102,7 @@ export class HomePage implements OnInit{
     }
   }
 
+  // getting current lat & lng by google api
   async getLocation() {
     let googleMaps: any = await this.gmaps.loadGoogleMaps();
     this.googleMaps = googleMaps;
