@@ -20,7 +20,17 @@
 
 // Overlapping the search result list 
 ion-searchbar {
-  padding: 1px !important;
+  // padding: 1px !important;
+  // position: absolute;
+  padding-left: 5%;
+  float: left;
+  width: 90%;
+}
+
+#trashBin {
+  // position: absolute;
+  float: left;
+  width: 5%;
 }
 
 ion-list {
