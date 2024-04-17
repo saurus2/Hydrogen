@@ -17,3 +17,25 @@
   width: 100%;
   padding: 10px;
 }
+
+// Overlapping the search result list 
+ion-searchbar {
+  padding: 1px !important;
+}
+
+ion-list {
+  position: absolute;
+  width: inherit;
+  overflow-y: scroll;
+  max-height: 150%;
+  width: 70%;
+  z-index: 999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -80%);
+
+  ion-item:hover {
+    cursor: pointer;
+    background: #f1f1f1;
+  }
+}

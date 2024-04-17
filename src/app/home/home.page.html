@@ -1,14 +1,46 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>
-      Google Maps
-      <ion-searchbar></ion-searchbar>
+      <!-- google map search -->
+      <div class="autocomplete">
+        <ion-searchbar
+          search-icon="search-circle"
+          animated="true"
+          show-clear-button="focus"
+          debounce="800"
+          placeholder="Search for area, street..."
+          (ionInput)="onSearchChange($event)">
+        </ion-searchbar>
+        <ion-button (click)="closeList()">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      </div>
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <!-- the results list for searching -->
+  <div class="searchList" *ngIf="isListOpen" #searchList>
+    <ion-list *ngIf="places?.length > 0">
+      <ion-item *ngFor="let place of places" class="ion-margin-top">
+        <ion-icon name="location-outline" slot="start"></ion-icon>
+        <ion-label>
+          {{ place?.title }}
+          <p>
+            <ion-text>
+              {{ place?.address }}
+            </ion-text>
+          </p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <!-- map  -->
   <div class="map" #map></div>
+
+  <!-- Button -->
   <ion-fab bottom id="menuButtons" style="display: flex; justify-content: space-around;">
     <ion-row text-center>
       <ion-col>

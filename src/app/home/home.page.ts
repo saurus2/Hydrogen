@@ -1,15 +1,21 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild, NgZone } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild, NgZone, OnDestroy } from '@angular/core';
 import { GmapsService } from '../services/gamps/gmaps.service';
 import { ClearWatchOptions, Geolocation } from '@capacitor/geolocation';
-import { Platform } from '@ionic/angular';
+import { IonicModule, Platform } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
+import { BehaviorSubject, Subscription } from 'rxjs';
+
+declare var google;
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
+  imports: [IonicModule, CommonModule],
+  standalone: true,
 })
 
-export class HomePage implements OnInit{
+export class HomePage implements OnInit, OnDestroy{
   
   @ViewChild('map', { static: true })
   mapElementRef!: ElementRef;
@@ -22,6 +28,18 @@ export class HomePage implements OnInit{
   currentLat: any;
   currentLng: any;
   watchId: any;
+  // hiding the list
+  isListOpen = true;
+
+  // google map search
+  places: any[] = [];
+  query: string;
+  placesSub: Subscription;
+  private _places = new BehaviorSubject<any[]>([]);
+
+  get search_places() {
+    return this._places.asObservable();
+  }
 
 
   constructor(
@@ -30,15 +48,33 @@ export class HomePage implements OnInit{
     private platform: Platform,
     public ngZone: NgZone,
   ) {
-
+    // this.renderer.listen('window', 'click', (e:Event)=> {
+    //   if(e.target !== this.map.nativeElement) {
+    //     console.log("clicked map out")
+    //   }
+    // });
   }
   
-  ngOnInit(): void {
+  // search implement
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
+  }
 
+  // search storing places
+  ngOnInit(): void {
+    this.placesSub = this.search_places.subscribe({
+      next: (places) => {
+        this.places = places;
+      },
+      error: (e) => {
+        console.log(e);
+      }
+    })
   }
 
   ngAfterViewInit(){
     this.loadMap();
+    this.isListOpen = true;
   }
 
   // loading map
@@ -123,5 +159,69 @@ export class HomePage implements OnInit{
       map: this.map,
     });
     this.map.setCenter(location);
+  }
+
+  // get the query from input
+  async onSearchChange(event: any){
+    // console.log(event);
+    this.isListOpen = true;
+    this.query = event.detail.value;
+    if(this.query.length > 0) await this.getPlaces();
+  }
+
+  // get place items from autocompleteservice 
+  async getPlaces() {
+    try {
+      let service = new google.maps.places.AutocompleteService();
+      service.getQueryPredictions({
+        input: this.query,
+      }, (predictions) => {
+        let AutocompleteItems = [];
+        this.ngZone.run(() => {
+          if(predictions != null) {
+            predictions.forEach(async(prediction) => {
+              // console.log('prediction: ', prediction);
+              let latLng: any = await this.geoCode(prediction.description);
+              const places = {
+                title: prediction.structured_formatting.main_text,
+                address: predictions.description,
+                lat: latLng.lat,
+                lng: latLng.lng
+              };
+              // console.log('places: ', places);
+              AutocompleteItems.push(places);
+            });
+            this.places = AutocompleteItems;
+            console.log('final places', this.places);
+          }
+        });
+      });
+    } catch(e) {
+      console.log(e);
+    }
+  }
+
+  // get lat and lng address
+  geoCode(address) {
+    let latlng = {lat: '', lng: ''};
+    return new Promise((resolve, reject) => {
+      let geocoder = new google.maps.Geocoder();
+      geocoder.geocode({'address' : address}, (results) => {
+        // console.log('results ', results);
+        latlng.lat = results[0].geometry.location.lat();
+        latlng.lng = results[0].geometry.location.lng();
+        resolve(latlng);
+      })
+    })
+  }
+
+  // close the list
+  closeList() {
+    this.isListOpen = false;
+  }
+
+  // destroy subscribe funciton for memory leak
+  onDestroy(): void{
+    if(this.placesSub) this.placesSub.unsubscribe();
   }
 }
