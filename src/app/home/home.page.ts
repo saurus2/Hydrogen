@@ -1,9 +1,11 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild, NgZone, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild, NgZone, OnDestroy, inject } from '@angular/core';
 import { GmapsService } from '../services/gamps/gmaps.service';
 import { ClearWatchOptions, Geolocation } from '@capacitor/geolocation';
 import { IonicModule, Platform } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject, Subscription } from 'rxjs';
+import { NrelService } from '../services/nrel.service';
+import { HttpClient } from '@angular/common/http';
 
 declare var google;
 
@@ -41,12 +43,16 @@ export class HomePage implements OnInit, OnDestroy{
     return this._places.asObservable();
   }
 
+  // Inject a nrel API
+  // Dependency Injection
+  private nrelServices = inject(NrelService);
 
   constructor(
     private gmaps: GmapsService,
     private renderer: Renderer2,
     private platform: Platform,
     public ngZone: NgZone,
+    public http: HttpClient,
   ) {
     // this.renderer.listen('window', 'click', (e:Event)=> {
     //   if(e.target !== this.map.nativeElement) {
@@ -75,6 +81,7 @@ export class HomePage implements OnInit, OnDestroy{
   ngAfterViewInit(){
     this.loadMap();
     this.isListOpen = true;
+    this.loadAllStations();
   }
 
   // loading map
@@ -223,5 +230,23 @@ export class HomePage implements OnInit, OnDestroy{
   // destroy subscribe funciton for memory leak
   onDestroy(): void{
     if(this.placesSub) this.placesSub.unsubscribe();
+  }
+
+  // need to seperate component
+  // load nrel API
+  loadAllStations() {
+    this.nrelServices.getAllStations().subscribe((res) => {
+      // console.log(res);
+      // Transfer the data to the json format
+      const jsonRes = JSON.stringify(res);
+      // console.log(jsonRes);
+      const parseRes = JSON.parse(jsonRes);
+      console.log(parseRes.fuel_stations);
+      
+      // for loop to print
+      parseRes.fuel_stations.forEach(function(item: { station_name: any; street_address: any; }) {
+        console.log(item.station_name, item.street_address);
+      });
+    });
   }
 }
