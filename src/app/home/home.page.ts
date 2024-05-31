@@ -154,6 +154,8 @@ export class HomePage implements OnInit, OnDestroy{
     this.currentLat = coordinates.coords.latitude;
     this.currentLng = coordinates.coords.longitude;
 
+    console.log("currentLat: ", this.currentLat, "currentLng: ", this.currentLng);
+
     const location = new googleMaps.LatLng(this.currentLat, this.currentLng);
     const icon = {
       url: 'assets/icon/pin.png',
@@ -234,8 +236,11 @@ export class HomePage implements OnInit, OnDestroy{
 
   // need to seperate component
   // load nrel API
-  loadAllStations() {
-    this.nrelServices.getAllStations().subscribe((res) => {
+  async loadAllStations() {
+    this.nrelServices.getAllStations(this.currentLat, this.currentLng).subscribe((res) => {
+      let googleMaps: any = this.googleMaps;
+      console.log("getAllStations in home page, currentLat: ", this.currentLat, "currentLng: ", this.currentLng);
+
       // console.log(res);
       // Transfer the data to the json format
       const jsonRes = JSON.stringify(res);
@@ -244,8 +249,12 @@ export class HomePage implements OnInit, OnDestroy{
       console.log(parseRes.fuel_stations);
       
       // for loop to print
-      parseRes.fuel_stations.forEach(function(item: { station_name: any; street_address: any; }) {
+      // parseRes.fuel_stations.forEach(function(item: { station_name: any; street_address: any; }) {
+      parseRes.fuel_stations.forEach((item: any) => {
         console.log(item.station_name, item.street_address);
+        console.log(item.latitude, item.longitude);
+        const location = new googleMaps.LatLng(item.latitude, item.longitude);
+        this.addMarker(location);
       });
     });
   }
