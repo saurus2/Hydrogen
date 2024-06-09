@@ -171,11 +171,12 @@ export class HomePage implements OnInit, OnDestroy{
   }
 
   // get the query from input
-  async onSearchChange(event: any){
-    // console.log(event);
+  async onSearchChange(event: any) {
     this.isListOpen = true;
     this.query = event.detail.value;
-    if(this.query.length > 0) await this.getPlaces();
+    if (this.query.length > 0) {
+      await this.getPlaces();
+    }
   }
 
   // get place items from autocompleteservice 
@@ -184,34 +185,32 @@ export class HomePage implements OnInit, OnDestroy{
       let service = new google.maps.places.AutocompleteService();
       service.getQueryPredictions({
         input: this.query,
-      }, (predictions) => {
+      }, (predictions, status) => {
         let AutocompleteItems = [];
-        this.ngZone.run(() => {
-          if(predictions != null) {
-            predictions.forEach(async(prediction) => {
-              // console.log('prediction: ', prediction);
+        this.ngZone.run(async () => {
+          if (predictions != null) {
+            for (const prediction of predictions) {
               let latLng: any = await this.geoCode(prediction.description);
               const places = {
                 title: prediction.structured_formatting.main_text,
-                address: predictions.description,
+                address: prediction.description,
                 lat: latLng.lat,
                 lng: latLng.lng
               };
-              // console.log('places: ', places);
               AutocompleteItems.push(places);
-            });
+            }
             this.places = AutocompleteItems;
             console.log('final places', this.places);
           }
         });
       });
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
   }
 
   // get lat and lng address
-  geoCode(address) {
+  geoCode(address: any) {
     let latlng = {lat: '', lng: ''};
     return new Promise((resolve, reject) => {
       let geocoder = new google.maps.Geocoder();

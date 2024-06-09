@@ -5,6 +5,7 @@
   background-color: transparent;
   opacity: 0;
   transition: opacity 150ms ease-in;
+  z-index: 1;
 }
 
 .map.visible {
@@ -20,32 +21,52 @@
 
 // Overlapping the search result list 
 ion-searchbar {
-  // padding: 1px !important;
-  // position: absolute;
   padding-left: 5%;
   float: left;
   width: 90%;
+  z-index: 3;
 }
 
 #trashBin {
-  // position: absolute;
   float: left;
   width: 5%;
+  z-index: 3;
 }
 
-ion-list {
+.searchList {
   position: absolute;
-  width: inherit;
-  overflow-y: scroll;
-  max-height: 150%;
-  width: 70%;
-  z-index: 999;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -80%);
+  top: 60px;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 300px; 
+  overflow-y: auto;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-  ion-item:hover {
-    cursor: pointer;
-    background: #f1f1f1;
-  }
+.searchList ion-list {
+  margin: 0;
+  padding: 0;
+}
+
+.searchList ion-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.searchList ion-icon {
+  margin-right: 10px;
+}
+
+.searchList p {
+  margin: 0;
+}
+
+.autocomplete {
+  position: relative;
+  display: flex;
+  align-items: center;
 }

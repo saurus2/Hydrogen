@@ -21,7 +21,7 @@
 
 <ion-content>
   <!-- the results list for searching -->
-  <div class="searchList" *ngIf="isListOpen" #searchList>
+  <div class="searchList" *ngIf="isListOpen && places?.length > 0" #searchList>
     <ion-list *ngIf="places?.length > 0">
       <ion-item *ngFor="let place of places" class="ion-margin-top">
         <ion-icon name="location-outline" slot="start"></ion-icon>
